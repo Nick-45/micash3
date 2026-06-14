@@ -144,7 +144,7 @@ const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
         </div>
         
         <div style={{ display: 'flex', gap: '12px' }}>
-          <button type="submit" style={{ flex: 2 }} disabled={loading || parentLoading}>
+          <button type="submit" style={{ flex: 2 }} disabled={loading}>
             {loading ? 'Processing...' : ' Submit to Queue'}
           </button>
           <button type="button" onClick={handleReset} className="btn-secondary" style={{ flex: 1 }}>
