@@ -70,13 +70,13 @@ const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
 
   return (
     <div className="glass-card" style={{ padding: '1.5rem' }}>
-      <h3 style={{ color: '#D4AF37', marginBottom: '1rem' }}>💸 New Disbursement</h3>
+      <h3 style={{ color: '#D4AF37', marginBottom: '1rem' }}> New Disbursement</h3>
       
       <Alert type={message?.type} message={message?.text} />
       
       <form onSubmit={handleSubmit}>
         <div className="input-group">
-          <label>🏥 Medical Facility</label>
+          <label> Medical Facility</label>
           <select 
             value={selectedFacility} 
             onChange={(e) => setSelectedFacility(e.target.value)}
@@ -92,7 +92,7 @@ const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
         </div>
         
         <div className="input-group">
-          <label>🏦 Account Details</label>
+          <label> Account Details</label>
           <input 
             type="text" 
             value={selectedFacilityData ? `${selectedFacilityData.bank} | ${selectedFacilityData.account}` : ''}
@@ -102,7 +102,7 @@ const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
         </div>
         
         <div className="input-group">
-          <label>💰 Amount (KES)</label>
+          <label> Amount (KES)</label>
           <input 
             type="number" 
             step="1000" 
@@ -113,7 +113,7 @@ const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
         </div>
         
         <div className="input-group">
-          <label>📝 Reference</label>
+          <label> Reference</label>
           <input 
             type="text" 
             value={reference} 
@@ -123,7 +123,7 @@ const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
         </div>
         
         <div className="input-group">
-          <label>⚡ Payment Channel</label>
+          <label> Payment Channel</label>
           <select value={channel} onChange={(e) => setChannel(e.target.value)}>
             {PAYMENT_CHANNELS.map(ch => (
               <option key={ch.value} value={ch.value}>
@@ -134,7 +134,7 @@ const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
         </div>
         
         <div className="input-group">
-          <label>🔑 Confirm Token</label>
+          <label> Confirm Token</label>
           <input 
             type="text" 
             value={token} 
