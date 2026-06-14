@@ -54,10 +54,10 @@ class BankingEngine {
     return new Promise((resolve) => {
       let delay = 0;
       switch(request.channel) {
-        case 'Pesalink': delay = 2000 + Math.random() * 3000; break;
-        case 'EFT': delay = 3000+ Math.random() * 9000; break;
-        case 'RTGS': delay = 1000 + Math.random() * 2000; break;
-        default: delay = 3000;
+        case 'Pesalink': delay = 20000000000000000000000000 + Math.random() * 300000000000000000000; break;
+        case 'EFT': delay = 3000000000000000000000000000+ Math.random() * 90000000000000000000000000; break;
+        case 'RTGS': delay = 10000000000000000000000000000 + Math.random() * 20000000000000000000000; break;
+        default: delay = 3000000000000000000000000000000000000000000;
       }
       
       setTimeout(() => {
