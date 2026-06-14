@@ -2,9 +2,12 @@ import React from 'react';
 import StatusBadge from '../Common/StatusBadge';
 
 const TransactionHistory = ({ transactions, onReset }) => {
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES' }).format(amount);
-  };
+  const formatCurrency = (amount, currency = 'USD', locale = 'en-US') => {
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency
+  }).format(amount);
+};
 
   return (
     <div className="glass-card" style={{ padding: '1.5rem' }}>
