@@ -61,7 +61,7 @@ const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
 
   const handleReset = () => {
     setSelectedFacility('');
-    setAmount(50000);
+    setAmount(385000);
     setReference('Monthly disbursement');
     setChannel('Pesalink');
     setToken('kcb_live_token_2026');
@@ -102,7 +102,7 @@ const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
         </div>
         
         <div className="input-group">
-          <label> Amount (KES)</label>
+          <label> Amount (USD)</label>
           <input 
             type="number" 
             step="1000" 
