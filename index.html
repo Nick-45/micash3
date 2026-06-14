@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>MICASH -  Payment Dashboard | DISBURSEMENT HUB</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Poppins', 'Inter', system-ui, -apple-system, sans-serif;
+            background: radial-gradient(circle at 20% 10%, #0a0a0a 0%, #000000 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated golden dust */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(rgba(212, 175, 55, 0.08) 1.5px, transparent 1.5px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 0;
+            animation: subtleDrift 20s linear infinite;
+        }
+
+        @keyframes subtleDrift {
+            0% { background-position: 0 0; }
+            100% { background-position: 100px 100px; }
+        }
+
+        /* Main container */
+        .app-container {
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Glassmorphic card style */
+        .glass-card {
+            background: rgba(8, 8, 8, 0.88);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 28px;
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(212, 175, 55, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        /* Logo */
+        .logo-area {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo-main {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #F3E5AB 0%, #D4AF37 25%, #FFD966 50%, #B8860B 75%, #D4AF37 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 25px rgba(212, 175, 55, 0.4);
+            letter-spacing: 4px;
+            animation: shimmerGold 4s linear infinite;
+        }
+
+        @keyframes shimmerGold {
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
+        }
+
+        .logo-sub {
+            color: #D4AF37;
+            font-size: 0.75rem;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            margin-top: 8px;
+            opacity: 0.8;
+        }
+
+        /* Dashboard grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+            margin-top: 24px;
+        }
+
+        /* Stats cards */
+        .stat-card {
+            background: linear-gradient(145deg, #0d0d0d 0%, #050505 100%);
+            border-radius: 24px;
+            padding: 1.5rem;
+            border-bottom: 2px solid #D4AF37;
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .stat-label {
+            color: #a08a4a;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #F3E5AB;
+            margin-top: 8px;
+        }
+
+        .stat-change {
+            font-size: 0.7rem;
+            color: #4caf50;
+            margin-top: 8px;
+        }
+
+        /* Form elements */
+        .input-group {
+            margin-bottom: 1.2rem;
+        }
+
+        label {
+            display: block;
+            color: #D4AF37;
+            margin-bottom: 0.5rem;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            font-weight: 500;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 16px;
+            background: #111111;
+            border: 1.5px solid #2a2a2a;
+            border-radius: 16px;
+            color: #fff;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #D4AF37;
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+        }
+
+        button {
+            background: linear-gradient(95deg, #D4AF37 0%, #B8860B 100%);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-weight: bold;
+            color: #000;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(212, 175, 55, 0.3);
+        }
+
+        .btn-secondary {
+            background: #1f1f1f;
+            color: #D4AF37;
+            border: 1px solid rgba(212, 175, 55, 0.4);
+        }
+
+        .paybill-badge {
+            background: linear-gradient(135deg, #D4AF37 0%, #B8860B 100%);
+            color: #000;
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-weight: bold;
+            font-size: 1rem;
+            display: inline-block;
+        }
+
+        /* Transactions table */
+        .transactions-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .transactions-table th {
+            text-align: left;
+            padding: 12px 8px;
+            color: #D4AF37;
+            font-weight: 500;
+            font-size: 0.7rem;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+        }
+
+        .transactions-table td {
+            padding: 12px 8px;
+            border-bottom: 1px solid #1a1a1a;
+            color: #ddd;
+            font-size: 0.8rem;
+        }
+
+        .badge-success {
+            background: rgba(76, 175, 80, 0.2);
+            color: #9bff9b;
+            padding: 4px 10px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+        }
+
+        .amount-positive {
+            color: #D4AF37;
+            font-weight: 600;
+        }
+
+        /* Alert & notification */
+        .alert {
+            padding: 14px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+        }
+
+        .alert-success {
+            background: rgba(212, 175, 55, 0.15);
+            border-left: 4px solid #D4AF37;
+            color: #F3E5AB;
+        }
+
+        .alert-error {
+            background: rgba(220, 53, 69, 0.15);
+            border-left: 4px solid #dc3545;
+            color: #ffb3b3;
+        }
+
+        /* Token input simulation */
+        .token-sim {
+            background: #030303;
+            border-radius: 20px;
+            padding: 12px 16px;
+            font-family: monospace;
+            font-size: 0.75rem;
+            color: #D4AF37;
+            word-break: break-all;
+            border: 1px dashed rgba(212, 175, 55, 0.5);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .logo-main { font-size: 2.2rem; }
+            .app-container { padding: 16px; }
+            .two-columns { grid-template-columns: 1fr !important; }
+        }
+    </style>
+</head>
+<body>
+<div class="app-container" id="app">
+    <!-- Dynamic content will be injected -->
+</div>
+
+<script>
+    // ============================================
+    // MICASH - B2B Payments for Medical Facilities
+    // Paybill: 522522 | KCB Bank Accounts
+    // ============================================
+    
+    // Medical facilities data from the image
+    const medicalFacilities = [
+        { name: "Medical Superintendent Nyamira", bank: "KCB Nyamira", account: "1152757091" },
+        { name: "Medical Superintendent Ekerenyo", bank: "KCB Nyamira", account: "1152767976" },
+        { name: "Medical Superintendent Keroka", bank: "KCB Keroka", account: "1152777661" },
+        { name: "Manga District Hospital", bank: "KCB Nyamira", account: "1152782088" },
+        { name: "Nyangena Sub-District Hospital", bank: "KCB Nyamira", account: "1152615718" },
+        { name: "Medical Superintendent Nyamusi", bank: "KCB Nyamira", account: "1152846930" }
+    ];
+    
+    const PAYBILL_NUMBER = "522522";
+    
+    // --- Mock Database (in-memory) ---
+    let mockState = {
+        loggedIn: false,
+        currentUser: null,
+        users: [
+            { id: 1, email: "admin@micash.com", password: "gold123", name: "MICASH Admin", accessToken: "mock_token_xyz_golden", balance: 250000.00 },
+            { id: 2, email: "finance@health.go.ke", password: "gold123", name: "Ministry of Health", accessToken: "mock_token_abc", balance: 125000.00 }
+        ],
+        transactions: [
+            { id: "TXN1001", date: "2026-06-10", amount: 12500.00, recipient: "Medical Superintendent Nyamira", account: "1152757091", status: "completed", type: "sent", description: "Monthly disbursement" },
+            { id: "TXN1002", date: "2026-06-08", amount: 8450.50, recipient: "Manga District Hospital", account: "1152782088", status: "completed", type: "sent", description: "Facility upgrade funds" },
+            { id: "TXN1003", date: "2026-06-05", amount: 3200.00, recipient: "Medical Superintendent Keroka", account: "1152777661", status: "completed", type: "sent", description: "Emergency allocation" }
+        ],
+        accessTokenInput: ""
+    };
+    
+    // Helper functions
+    function formatCurrency(amount) {
+        return new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES' }).format(amount);
+    }
+    
+    function formatKES(amount) {
+        return `KES ${amount.toLocaleString('en-KE')}`;
+    }
+    
+    function getRandomTxnId() {
+        return "MIC" + Date.now() + Math.floor(Math.random() * 10000);
+    }
+    
+    function showNotification(message, type = 'success', duration = 4000) {
+        const notifDiv = document.getElementById('globalNotification');
+        if (notifDiv) {
+            notifDiv.innerHTML = `<div class="alert alert-${type}"> ${message}</div>`;
+            setTimeout(() => {
+                if (notifDiv) notifDiv.innerHTML = '';
+            }, duration);
+        }
+    }
+    
+    // Render engine
+    function renderApp() {
+        const appEl = document.getElementById('app');
+        if (!mockState.loggedIn) {
+            appEl.innerHTML = renderLoginScreen();
+            attachLoginEvents();
+        } else {
+            appEl.innerHTML = renderDashboard();
+            attachDashboardEvents();
+            updateDashboardStats();
+            renderTransactionHistory();
+            populateFacilityDropdown();
+        }
+    }
+    
+    // ---------- LOGIN SCREEN ----------
+    function renderLoginScreen() {
+        return `
+            <div class="glass-card" style="max-width: 480px; margin: 5vh auto; padding: 2rem;">
+                <div class="logo-area">
+                    <div class="logo-main">MICASH</div>
+                    <div class="logo-sub">✦ B2B MEDICAL PAYMENTS ✦</div>
+                    <div style="margin-top: 15px;">
+                        <span class="paybill-badge">Paybill: ${PAYBILL_NUMBER}</span>
+                    </div>
+                </div>
+                
+                <div id="loginMessage"></div>
+                
+                <div class="input-group">
+                    <label>📧 Business Email</label>
+                    <input type="email" id="loginEmail" placeholder="admin@micash.com" value="admin@micash.com">
+                </div>
+                <div class="input-group">
+                    <label>🔒 Password</label>
+                    <input type="password" id="loginPassword" placeholder="••••••" value="gold123">
+                </div>
+                
+                <div class="input-group">
+                    <label>🔑 Access Token (KCB Integration)</label>
+                    <input type="text" id="simulatedToken" placeholder="Paste your KCB API token" value="kcb_live_token_2026">
+                    <small style="display: block; margin-top: 6px; color:#888;">Secure token for KCB bank integration</small>
+                </div>
+                
+                <button id="simulateLoginBtn" style="width:100%; margin-top: 8px;">➜ Access Dashboard</button>
+                
+                <div style="margin-top: 25px; text-align: center; font-size: 12px; color: #5a5a5a; border-top: 1px solid #222; padding-top: 20px;">
+                     Demo: admin@micash.com / gold123<br>
+                     Paybill ${PAYBILL_NUMBER} | KCB Medical Accounts
+                </div>
+            </div>
+        `;
+    }
+    
+    function attachLoginEvents() {
+        const loginBtn = document.getElementById('simulateLoginBtn');
+        if (!loginBtn) return;
+        
+        loginBtn.addEventListener('click', () => {
+            const email = document.getElementById('loginEmail')?.value.trim();
+            const pwd = document.getElementById('loginPassword')?.value;
+            const token = document.getElementById('simulatedToken')?.value.trim();
+            const msgDiv = document.getElementById('loginMessage');
+            
+            if (!email || !pwd) {
+                msgDiv.innerHTML = '<div class="alert alert-error">❌ Email and password required</div>';
+                return;
+            }
+            if (!token) {
+                msgDiv.innerHTML = '<div class="alert alert-error">❌ Access token required for KCB integration</div>';
+                return;
+            }
+            
+            const user = mockState.users.find(u => u.email === email && u.password === pwd);
+            if (user) {
+                mockState.currentUser = { ...user };
+                mockState.accessTokenInput = token;
+                mockState.loggedIn = true;
+                showNotification(`Welcome ${user.name}. KCB Paybill ${PAYBILL_NUMBER} ready.`, 'success');
+                renderApp();
+            } else {
+                msgDiv.innerHTML = '<div class="alert alert-error">Invalid credentials. Use admin@micash.com / gold123</div>';
+            }
+        });
+    }
+    
+    // ---------- DASHBOARD ----------
+    function renderDashboard() {
+        const user = mockState.currentUser;
+        if (!user) return `<div>Error: no session</div>`;
+        
+        return `
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 20px;">
+                <div class="logo-area" style="margin-bottom:0;">
+                    <div class="logo-main" style="font-size:2rem;">MICASH</div>
+                    <div class="logo-sub">KCB MEDICAL DISBURSEMENTS</div>
+                </div>
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <span class="paybill-badge" style="font-size:0.9rem;">Paybill: ${PAYBILL_NUMBER}</span>
+                    <span style="background: #000000aa; backdrop-filter: blur(4px); padding: 8px 18px; border-radius: 40px; color:#D4AF37; border:1px solid rgba(212,175,55,0.3);">
+                         ${escapeHtml(user.name)}
+                    </span>
+                    <button id="logoutBtnSim" class="btn-secondary"> Logout</button>
+                </div>
+            </div>
+            
+            <!-- Stats row -->
+            <div class="dashboard-grid">
+                <div class="stat-card">
+                    <div class="stat-label">AVAILABLE BALANCE</div>
+                    <div class="stat-value" id="totalBalanceDisplay">${formatCurrency(user.balance)}</div>
+                    <div class="stat-change">KCB Business Account</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">TOTAL DISBURSED (MTD)</div>
+                    <div class="stat-value" id="totalSentDisplay">${formatCurrency(calculateTotalSent())}</div>
+                    <div class="stat-change">To ${medicalFacilities.length} facilities</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">KCB API STATUS</div>
+                    <div class="stat-value" style="font-size:1rem;">Active</div>
+                    <div class="token-sim" style="margin-top: 8px;">Token: ${mockState.accessTokenInput.substring(0, 15)}...</div>
+                </div>
+            </div>
+            
+            <!-- Two column layout -->
+            <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 24px; margin-top: 32px;" class="two-columns">
+                <!-- Left: Send B2B Payment -->
+                <div class="glass-card" style="padding: 1.5rem;">
+                    <h3 style="color:#D4AF37; margin-bottom: 1rem; font-size:1.3rem;"> Pay Medical Facility</h3>
+                    <div id="paymentMsgSim"></div>
+                    
+                    <div class="input-group">
+                        <label> Select Medical Facility</label>
+                        <select id="facilityDropdown">
+                            <option value="">-- Select Facility --</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Bank & Account Number</label>
+                        <input type="text" id="accountDisplay" readonly placeholder="Account will appear here" style="background:#0a0a0a; cursor:pointer;">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label> Amount (KES)</label>
+                        <input type="number" id="paymentAmount" step="1000" placeholder="0.00" value="50000">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label> Payment Reference</label>
+                        <input type="text" id="paymentRef" placeholder="e.g., Monthly disbursement, Emergency fund" value="Facility allocation">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Confirm KCB Access Token</label>
+                        <input type="text" id="confirmTokenField" placeholder="KCB API token" value="${mockState.accessTokenInput}">
+                    </div>
+                    
+                    <div style="display: flex; gap: 12px;">
+                        <button id="sendPaymentBtn" style="flex:2;">✅ Send via Paybill ${PAYBILL_NUMBER}</button>
+                        <button id="resetFormBtn" class="btn-secondary" style="flex:1;">Reset</button>
+                    </div>
+                </div>
+                
+                <!-- Right: Recent transactions -->
+                <div class="glass-card" style="padding: 1.5rem;">
+                    <h3 style="color:#D4AF37; margin-bottom: 1rem; font-size:1.3rem;">📋 Payment History</h3>
+                    <div id="transactionHistoryContainer" style="max-height: 360px; overflow-y: auto;">
+                        <!-- dynamic table -->
+                    </div>
+                    <button id="clearHistoryBtn" class="btn-secondary" style="margin-top: 15px; width:100%; background:#141414;">⟳ Reset Demo Data</button>
+                </div>
+            </div>
+            
+            <!-- Facility summary -->
+            <div class="glass-card" style="margin-top: 28px; padding: 1rem 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                    <span style="color:#D4AF37;">Registered Medical Facilities (KCB Accounts)</span>
+                    <span style="color:#B8860B;">Total: ${medicalFacilities.length} facilities</span>
+                </div>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;">
+                    ${medicalFacilities.map(f => `<span style="background:#111; padding:4px 12px; border-radius:20px; font-size:0.7rem; color:#D4AF37;">${f.name.substring(0, 25)}</span>`).join('')}
+                </div>
+            </div>
+            
+            <div id="globalNotification" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000; max-width: 350px;"></div>
+        `;
+    }
+    
+    function populateFacilityDropdown() {
+        const dropdown = document.getElementById('facilityDropdown');
+        if (!dropdown) return;
+        
+        dropdown.innerHTML = '<option value="">-- Select Medical Facility --</option>';
+        medicalFacilities.forEach((facility, index) => {
+            const option = document.createElement('option');
+            option.value = index;
+            option.textContent = `${facility.name} - ${facility.bank} (${facility.account})`;
+            dropdown.appendChild(option);
+        });
+        
+        // Auto-fill account when facility selected
+        dropdown.addEventListener('change', () => {
+            const selectedIndex = dropdown.value;
+            const accountInput = document.getElementById('accountDisplay');
+            if (selectedIndex !== "" && medicalFacilities[selectedIndex]) {
+                const fac = medicalFacilities[selectedIndex];
+                accountInput.value = `${fac.bank} | Account: ${fac.account}`;
+            } else {
+                accountInput.value = '';
+            }
+        });
+    }
+    
+    function calculateTotalSent() {
+        const sentTxns = mockState.transactions.filter(t => t.type === 'sent' && t.status === 'completed');
+        return sentTxns.reduce((sum, t) => sum + t.amount, 0);
+    }
+    
+    function updateDashboardStats() {
+        if (!mockState.currentUser) return;
+        const balanceSpan = document.getElementById('totalBalanceDisplay');
+        const sentSpan = document.getElementById('totalSentDisplay');
+        if (balanceSpan) balanceSpan.innerText = formatCurrency(mockState.currentUser.balance);
+        if (sentSpan) sentSpan.innerText = formatCurrency(calculateTotalSent());
+    }
+    
+    function renderTransactionHistory() {
+        const container = document.getElementById('transactionHistoryContainer');
+        if (!container) return;
+        
+        if (mockState.transactions.length === 0) {
+            container.innerHTML = '<div style="text-align:center;padding:30px;color:#777;">No payments yet. Send funds to medical facilities.</div>';
+            return;
+        }
+        
+        let html = `<table class="transactions-table">
+            <thead>
+                <tr><th>Date</th><th>Facility</th><th>Account</th><th>Amount</th><th>Status</th></tr>
+            </thead>
+            <tbody>`;
+        
+        [...mockState.transactions].reverse().forEach(txn => {
+            html += `
+                <tr>
+                    <td>${txn.date}</td>
+                    <td>${escapeHtml(txn.recipient.substring(0, 25))}${txn.recipient.length > 25 ? '...' : ''}</td>
+                    <td><small>${txn.account || '—'}</small></td>
+                    <td class="amount-positive">${formatCurrency(txn.amount)}</td>
+                    <td><span class="badge-success">${txn.status}</span></td>
+                </tr>
+            `;
+        });
+        html += `</tbody></table>`;
+        container.innerHTML = html;
+    }
+    
+    function attachDashboardEvents() {
+        const logoutBtn = document.getElementById('logoutBtnSim');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                mockState.loggedIn = false;
+                mockState.currentUser = null;
+                renderApp();
+            });
+        }
+        
+        const sendBtn = document.getElementById('sendPaymentBtn');
+        const resetBtn = document.getElementById('resetFormBtn');
+        const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+        
+        if (sendBtn) {
+            sendBtn.addEventListener('click', () => {
+                simulateB2BPayment();
+            });
+        }
+        
+        if (resetBtn) {
+            resetBtn.addEventListener('click', () => {
+                document.getElementById('facilityDropdown').value = '';
+                document.getElementById('accountDisplay').value = '';
+                document.getElementById('paymentAmount').value = '50000';
+                document.getElementById('paymentRef').value = 'Facility allocation';
+                document.getElementById('confirmTokenField').value = mockState.accessTokenInput || 'kcb_token';
+                const msgDiv = document.getElementById('paymentMsgSim');
+                if (msgDiv) msgDiv.innerHTML = '';
+            });
+        }
+        
+        if (clearHistoryBtn) {
+            clearHistoryBtn.addEventListener('click', () => {
+                mockState.transactions = [
+                    { id: "TXN1001", date: "2026-06-10", amount: 12500.00, recipient: "Medical Superintendent Nyamira", account: "1152757091", status: "completed", type: "sent", description: "Monthly disbursement" },
+                    { id: "TXN1002", date: "2026-06-08", amount: 8450.50, recipient: "Manga District Hospital", account: "1152782088", status: "completed", type: "sent", description: "Facility upgrade funds" }
+                ];
+                if (mockState.currentUser) mockState.currentUser.balance = 250000.00;
+                updateDashboardStats();
+                renderTransactionHistory();
+                showNotification("Payment history reset to default", "success");
+            });
+        }
+    }
+    
+    function simulateB2BPayment() {
+        const dropdown = document.getElementById('facilityDropdown');
+        const selectedIndex = dropdown.value;
+        const amount = parseFloat(document.getElementById('paymentAmount')?.value);
+        const reference = document.getElementById('paymentRef')?.value.trim() || "Medical facility payment";
+        const tokenField = document.getElementById('confirmTokenField')?.value.trim();
+        const msgDiv = document.getElementById('paymentMsgSim');
+        
+        if (selectedIndex === "" || !medicalFacilities[selectedIndex]) {
+            msgDiv.innerHTML = '<div class="alert alert-error">❌ Please select a medical facility from the dropdown</div>';
+            return;
+        }
+        
+        const facility = medicalFacilities[selectedIndex];
+        
+        if (isNaN(amount) || amount <= 0) {
+            msgDiv.innerHTML = '<div class="alert alert-error">❌ Valid amount greater than 0 required (KES)</div>';
+            return;
+        }
+        
+        if (!tokenField) {
+            msgDiv.innerHTML = '<div class="alert alert-error">❌ KBC Access Token required for payment authorization</div>';
+            return;
+        }
+        
+        if (tokenField.length < 5) {
+            msgDiv.innerHTML = '<div class="alert alert-error">❌ Invalid token format</div>';
+            return;
+        }
+        
+        // Check balance
+        const userBalance = mockState.currentUser.balance;
+        if (amount > userBalance) {
+            msgDiv.innerHTML = `<div class="alert alert-error">❌ Insufficient balance. Available: ${formatCurrency(userBalance)}</div>`;
+            return;
+        }
+        
+        // Deduct balance
+        mockState.currentUser.balance -= amount;
+        
+        // Create transaction record
+        const newTransaction = {
+            id: getRandomTxnId(),
+            date: new Date().toISOString().slice(0, 10),
+            amount: amount,
+            recipient: facility.name,
+            account: facility.account,
+            bank: facility.bank,
+            status: "completed",
+            type: "sent",
+            description: reference,
+            paybill: PAYBILL_NUMBER
+        };
+        
+        mockState.transactions.push(newTransaction);
+        
+        // Update UI
+        updateDashboardStats();
+        renderTransactionHistory();
+        
+        // Success message
+        msgDiv.innerHTML = `
+            <div class="alert alert-success">
+                ✅ PAYMENT SUCCESSFUL via Paybill ${PAYBILL_NUMBER}<br><br>
+                 <strong>${escapeHtml(facility.name)}</strong><br>
+                 ${facility.bank} | Account: ${facility.account}<br>
+                 Amount: ${formatCurrency(amount)}<br>
+                 Ref: ${escapeHtml(reference)}<br>
+                 Authorized with KCB token: ${tokenField.substring(0, 8)}...<br>
+                 Transaction ID: ${newTransaction.id}
+            </div>
+        `;
+        
+        document.getElementById('paymentAmount').value = '';
+        document.getElementById('facilityDropdown').value = '';
+        document.getElementById('accountDisplay').value = '';
+        
+        showNotification(`KES ${amount.toLocaleString()} sent to ${facility.name} via Paybill ${PAYBILL_NUMBER}`, 'success', 5000);
+        
+        const txnContainer = document.getElementById('transactionHistoryContainer');
+        if (txnContainer) txnContainer.scrollTop = 0;
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    // Initial render
+    renderApp();
+</script>
+</body>
+</html>
