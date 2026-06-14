@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MEDICAL_FACILITIES, PAYMENT_CHANNELS, PAYBILL_NUMBER } from '../../../constants';
+import { MEDICAL_FACILITIES, PAYMENT_CHANNELS, PAYBILL_NUMBER } from '../../constants';
 import Alert from '../Common/Alert';
 
 const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
@@ -145,7 +145,7 @@ const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
         
         <div style={{ display: 'flex', gap: '12px' }}>
           <button type="submit" style={{ flex: 2 }} disabled={loading || parentLoading}>
-            {loading ? 'Processing...' : '💸 Submit to Queue'}
+            {loading ? 'Processing...' : ' Submit to Queue'}
           </button>
           <button type="button" onClick={handleReset} className="btn-secondary" style={{ flex: 1 }}>
             Reset
