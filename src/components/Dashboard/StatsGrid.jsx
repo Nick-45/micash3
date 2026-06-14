@@ -13,7 +13,7 @@ const StatsGrid = ({ balance, queueSize, token }) => {
   return (
     <div className="dashboard-grid">
       <StatCard 
-        label="TTARGET AMOUNT" 
+        label="TARGET AMOUNT" 
         value={formatCurrency(balance)} 
         subtext="Source of truth" 
       />
