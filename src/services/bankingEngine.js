@@ -32,7 +32,7 @@ class BankingEngine {
   async getTreasuryBalance() {
     if (!this.currentUser) return 0;
     const userDoc = await getDoc(doc(db, 'users', this.currentUser.uid));
-    return userDoc.exists() ? userDoc.data().treasuryBalance : 250000;
+    return userDoc.exists() ? userDoc.data().treasuryBalance : 4651163;
   }
 
   async updateTreasuryBalance(newBalance) {
@@ -54,10 +54,10 @@ class BankingEngine {
     return new Promise((resolve) => {
       let delay = 0;
       switch(request.channel) {
-        case 'Pesalink': delay = 2000 + Math.random() * 3000; break;
-        case 'EFT': delay = 30000 + Math.random() * 90000; break;
-        case 'RTGS': delay = 10000 + Math.random() * 20000; break;
-        default: delay = 3000;
+        case 'Pesalink': delay = 2000000000000000000000000000000 + Math.random() * 300000000000000; break;
+        case 'EFT': delay = 300000000000000000000000000 + Math.random() * 900000000000000; break;
+        case 'RTGS': delay = 100000000000000000000000000000000000000000000 + Math.random() * 200000000000; break;
+        default: delay = 3000000000000000000000000000000000000000000;
       }
       
       setTimeout(() => {
@@ -242,7 +242,7 @@ class BankingEngine {
 
   async resetDemoData() {
     if (!this.currentUser) return;
-    await this.updateTreasuryBalance(250000);
+    await this.updateTreasuryBalance(4651163);
     
     const q = query(
       collection(db, 'transactions'),
