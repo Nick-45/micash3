@@ -3,8 +3,12 @@ import StatCard from '../Common/StatCard';
 
 const StatsGrid = ({ balance, queueSize, token }) => {
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES' }).format(amount);
+    return new Intl.NumberFormat('en-US', { 
+      style: 'currency', 
+      currency: 'USD' 
+    }).format(amount);
   };
+};
 
   return (
     <div className="dashboard-grid">
