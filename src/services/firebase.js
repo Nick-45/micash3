@@ -3,15 +3,16 @@ import { getFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyDmhbZRsmJEk15BSB1kDQV4ilsBYdpNa88",
+  authDomain: "gigs-connect.firebaseapp.com",
+  projectId: "gigs-connect",
+  storageBucket: "gigs-connect.firebasestorage.app",
+  messagingSenderId: "860870913180",
+  appId: "1:860870913180:web:0a5999d729acebf63c5159"
 };
 
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = getAuth(app);
 export default app;
+
