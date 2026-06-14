@@ -1,5 +1,5 @@
 import React from 'react';
-import { TRANSACTION_STATUS } from '../../../constants';
+import { TRANSACTION_STATUS } from '../../constants';
 
 const StatusBadge = ({ status }) => {
   const config = {
