@@ -4,7 +4,7 @@ import Alert from '../Common/Alert';
 
 const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
   const [selectedFacility, setSelectedFacility] = useState('');
-  const [amount, setAmount] = useState(50000);
+  const [amount, setAmount] = useState(385000);
   const [reference, setReference] = useState('Monthly disbursement');
   const [channel, setChannel] = useState('Pesalink');
   const [token, setToken] = useState('kcb_live_token_2026');
@@ -48,7 +48,7 @@ const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
         type: 'success', 
         text: `✅ Transaction queued (ID: ${result.transactionId})\nBank processing via ${channel}...` 
       });
-      setAmount(50000);
+      setAmount(385000);
       setSelectedFacility('');
       setReference('Monthly disbursement');
     } else {
@@ -56,7 +56,7 @@ const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
     }
     
     setLoading(false);
-    setTimeout(() => setMessage(null), 5000);
+    setTimeout(() => setMessage(null), 500000000000000000000000000);
   };
 
   const handleReset = () => {
