@@ -10,7 +10,7 @@ const LoginPage = ({ onLogin }) => {
     <div className="glass-card" style={{ maxWidth: '480px', margin: '5vh auto', padding: '2rem' }}>
       <div className="logo-area" style={{ textAlign: 'center' }}>
         <div className="logo-main">MICASH</div>
-        <div className="logo-sub">✦ REALISTIC BANKING SIMULATOR ✦</div>
+        <div className="logo-sub">✦ DISBURSEMENT HUB ✦</div>
         <div style={{ marginTop: '15px' }}>
           <span className="paybill-badge">Paybill: {PAYBILL_NUMBER}</span>
         </div>
