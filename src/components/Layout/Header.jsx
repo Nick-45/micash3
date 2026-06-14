@@ -1,5 +1,5 @@
 import React from 'react';
-import { PAYBILL_NUMBER } from '../../../constants';
+import { PAYBILL_NUMBER } from '../../constants';
 
 const Header = ({ user, onLogout }) => {
   return (
