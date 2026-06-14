@@ -8,7 +8,7 @@ const StatsGrid = ({ balance, queueSize, token }) => {
       currency: 'USD' 
     }).format(amount);
   };
-};
+
 
   return (
     <div className="dashboard-grid">
