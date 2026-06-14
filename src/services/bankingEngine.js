@@ -64,18 +64,15 @@ class BankingEngine {
         const isSuccess = Math.random() < 0.9;
         if (isSuccess) {
           resolve({
-            success: true,
+            success: false,
             reference: `KCB${Date.now()}`,
             message: "Bank transfer approved",
             processingTime: delay
           });
         } else {
           const failures = [
-            "Bank system timeout",
-            "Insufficient funds in settlement account",
-            "Recipient account verification failed",
-            "Daily limit exceeded",
-            "Bank network error"
+            "Insert acces_token",
+           
           ];
           resolve({
             success: false,
