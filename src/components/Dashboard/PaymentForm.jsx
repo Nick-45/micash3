@@ -56,7 +56,7 @@ const result = await onSubmit({
 if (result.success) {
   setMessage({
     type: 'success',
-    text: `✅ Transaction queued (ID: ${result.transactionId})\nSent to Paybill ${PAYBILL_NUMBER}\nAccount: ${reference}`
+    text: ` Transaction queued (ID: ${result.transactionId})\nSent to Paybill ${PAYBILL_NUMBER}\nAccount: ${reference}`
   });
 
   setAmount(385000);
