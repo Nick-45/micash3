@@ -22,27 +22,27 @@ exports.handler = async (event) => {
     // 💱 Convert USD → KES
     const amountKES = Math.round(amount * 129);
 
-    // ✅ Use your pre-encrypted password directly
-    const securityCredential = process.env.INITIATOR_PASSWORD;
-
-    // 💸 B2B Request
+    // 💸 B2B Request with required identifier fields
     const response = await axios.post(
       "https://sandbox.safaricom.co.ke/mpesa/b2b/v1/paymentrequest",
       {
-  Initiator: process.env.INITIATOR_NAME,
-  SecurityCredential: process.env.INITIATOR_PASSWORD,
-  CommandID: "BusinessPayBill",
-  Amount: amountKES,
-  PartyA: process.env.SHORTCODE,
-  PartyB: paybill,
-  Remarks: "Medical Disbursement",
-  AccountReference: account,
-  QueueTimeOutURL: process.env.TIMEOUT_URL,
-  ResultURL: process.env.RESULT_URL,
-},
+        Initiator: process.env.INITIATOR_NAME,
+        SecurityCredential: process.env.INITIATOR_PASSWORD,
+        CommandID: "BusinessPayBill",
+        Amount: amountKES,
+        PartyA: process.env.SHORTCODE,
+        PartyB: paybill,
+        SenderIdentifierType: 4,      // Required - Your shortcode type
+        ReceiverIdentifierType: 4,    // Required - Paybill type
+        Remarks: "Medical Disbursement",
+        AccountReference: account,
+        QueueTimeOutURL: process.env.TIMEOUT_URL,
+        ResultURL: process.env.RESULT_URL,
+      },
       {
         headers: {
           Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
       }
     );
