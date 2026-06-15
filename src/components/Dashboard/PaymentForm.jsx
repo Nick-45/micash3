@@ -14,8 +14,8 @@ const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
   // Exchange rate (1 USD = 129 KES)
   const EXCHANGE_RATE = 129;
   
-  // Calculate KES amount for display
-  const amountKES = Math.round(amountUSD * EXCHANGE_RATE);
+  // Calculate KES amount for display (handle NaN safely)
+  const amountKES = !isNaN(amountUSD) && amountUSD > 0 ? Math.round(amountUSD * EXCHANGE_RATE) : 0;
 
   const selectedFacilityData = 
     selectedFacility !== '' ? MEDICAL_FACILITIES[selectedFacility] : null;
@@ -35,6 +35,24 @@ const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
     }
   }, [selectedFacility]);
 
+  // Handle amount change safely
+  const handleAmountChange = (e) => {
+    const value = e.target.value;
+    // Remove any non-numeric characters except decimal point
+    const cleanValue = value.replace(/[^0-9.]/g, '');
+    
+    if (cleanValue === '' || cleanValue === '.') {
+      setAmountUSD(0);
+    } else {
+      const parsed = parseFloat(cleanValue);
+      if (!isNaN(parsed) && isFinite(parsed)) {
+        setAmountUSD(parsed);
+      } else {
+        setAmountUSD(0);
+      }
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -43,7 +61,7 @@ const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
       return;
     }
 
-    if (amountUSD <= 0) {
+    if (amountUSD <= 0 || isNaN(amountUSD)) {
       setMessage({ type: 'error', text: 'Valid amount required' });
       return;
     }
@@ -88,6 +106,7 @@ const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
       setSelectedFacility('');
       setReference('Monthly disbursement');
       setPaybill('');
+      setToken('');
     } else {
       setMessage({ type: 'error', text: `❌ ${result.error}` });
     }
@@ -165,14 +184,15 @@ const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
         <div className="input-group">
           <label>Amount (USD)</label>
           <input
-            type="number"
-            step="1000"
-            value={amountUSD}
-            onChange={(e) => setAmountUSD(parseFloat(e.target.value))}
+            type="text"
+            inputMode="numeric"
+            value={amountUSD === 0 ? '' : amountUSD}
+            onChange={handleAmountChange}
+            placeholder="Enter amount in USD"
             required
           />
           {/* Show KES conversion in real-time */}
-          {amountUSD > 0 && (
+          {amountKES > 0 && (
             <small style={{ color: '#D4AF37', display: 'block', marginTop: '4px' }}>
               ≈ {amountKES.toLocaleString()} KES (Exchange rate: 1 USD = {EXCHANGE_RATE} KES)
             </small>
