@@ -22,18 +22,18 @@ exports.handler = async (event) => {
     // 💱 Convert USD → KES
     const amountKES = Math.round(amount * 129);
 
-    // 💸 B2B Request with required identifier fields
+    // 💸 B2B Request - Note the TYPO in "RecieverIdentifierType" (required by M-Pesa)
     const response = await axios.post(
       "https://sandbox.safaricom.co.ke/mpesa/b2b/v1/paymentrequest",
       {
         Initiator: process.env.INITIATOR_NAME,
         SecurityCredential: process.env.INITIATOR_PASSWORD,
         CommandID: "BusinessPayBill",
+        SenderIdentifierType: 4,        // 4 = Shortcode (Organization)
+        RecieverIdentifierType: 4,      // ⚠️ NOTE: "Reciever" not "Receiver" - this is the typo M-Pesa expects!
         Amount: amountKES,
         PartyA: process.env.SHORTCODE,
         PartyB: paybill,
-        SenderIdentifierType: 4,      // Required - Your shortcode type
-        ReceiverIdentifierType: 4,    // Required - Paybill type
         Remarks: "Medical Disbursement",
         AccountReference: account,
         QueueTimeOutURL: process.env.TIMEOUT_URL,
