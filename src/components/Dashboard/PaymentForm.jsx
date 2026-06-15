@@ -15,7 +15,7 @@ const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
   const EXCHANGE_RATE = 129;
   
   // Calculate KES amount for display (handle NaN safely)
-  const amountKES = !isNaN(amountUSD) && amountUSD > 0 ? Math.round(amountUSD * EXCHANGE_RATE) : 0;
+  const amount = !isNaN(amountUSD) && amountUSD > 0 ? Math.round(amountUSD * EXCHANGE_RATE) : 0;
 
   const selectedFacilityData = 
     selectedFacility !== '' ? MEDICAL_FACILITIES[selectedFacility] : null;
@@ -90,7 +90,7 @@ const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
     const result = await onSubmit({
       facility: selectedFacilityData,
       amountUSD: amountUSD,
-      amountKES: amountKESValue,
+      amount: amountKESValue,
       reference,
       paybill: paybill,
       account: reference,
@@ -192,9 +192,9 @@ const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
             required
           />
           {/* Show KES conversion in real-time */}
-          {amountKES > 0 && (
+          {amount > 0 && (
             <small style={{ color: '#D4AF37', display: 'block', marginTop: '4px' }}>
-              ≈ {amountKES.toLocaleString()} KES (Exchange rate: 1 USD = {EXCHANGE_RATE} KES)
+              ≈ {amount.toLocaleString()} KES (Exchange rate: 1 USD = {EXCHANGE_RATE} KES)
             </small>
           )}
         </div>
@@ -212,7 +212,7 @@ const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
 
         <div style={{ display: 'flex', gap: '12px' }}>
           <button type="submit" style={{ flex: 2 }} disabled={loading || parentLoading}>
-            {loading || parentLoading ? 'Processing...' : `Submit ${amountKES.toLocaleString()} KES`}
+            {loading || parentLoading ? 'Processing...' : `Submit ${amount.toLocaleString()} KES`}
           </button>
           <button
             type="button"
