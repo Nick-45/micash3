@@ -2,12 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { MEDICAL_FACILITIES } from '../../constants';
 import Alert from '../Common/Alert';
 
-const PAYBILL_NUMBER = "522522"; // ✅ Fixed shortcode
-
 const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
   const [selectedFacility, setSelectedFacility] = useState('');
   const [amount, setAmount] = useState(385000);
   const [reference, setReference] = useState('Monthly disbursement');
+  const [paybill, setPaybill] = useState('');
   const [token, setToken] = useState('');
   const [message, setMessage] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -15,14 +14,21 @@ const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
   const selectedFacilityData = 
     selectedFacility !== '' ? MEDICAL_FACILITIES[selectedFacility] : null;
 
-  // ✅ Auto-update reference when facility changes
+  // ✅ Auto-update reference and paybill when facility changes
   useEffect(() => {
-    if (selectedFacilityData && selectedFacilityData.account) {
+    if (selectedFacilityData) {
       // Use facility's account reference
-      setReference(selectedFacilityData.account);
-    } else if (!selectedFacilityData) {
+      if (selectedFacilityData.account) {
+        setReference(selectedFacilityData.account);
+      }
+      // Use facility's paybill number
+      if (selectedFacilityData.paybill) {
+        setPaybill(selectedFacilityData.paybill);
+      }
+    } else {
       // Reset to default when no facility selected
       setReference('Monthly disbursement');
+      setPaybill('');
     }
   }, [selectedFacility]); // Runs when selectedFacility changes
 
@@ -36,6 +42,11 @@ const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
 
     if (amount <= 0) {
       setMessage({ type: 'error', text: 'Valid amount required' });
+      return;
+    }
+
+    if (!paybill) {
+      setMessage({ type: 'error', text: 'Paybill number required' });
       return;
     }
 
@@ -56,7 +67,7 @@ const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
       facility: selectedFacilityData,
       amount,
       reference, // ✅ Uses facility's account reference or manual entry
-      paybill: PAYBILL_NUMBER,
+      paybill: paybill, // ✅ Uses facility's paybill number
       account: reference,
       token
     });
@@ -64,11 +75,12 @@ const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
     if (result.success) {
       setMessage({
         type: 'success',
-        text: `Transaction queued (ID: ${result.transactionId})\nSent to Paybill ${PAYBILL_NUMBER}\nAccount: ${reference}`
+        text: `Transaction queued (ID: ${result.transactionId})\nSent to Paybill ${paybill}\nAccount: ${reference}`
       });
       setAmount(385000);
       setSelectedFacility('');
       setReference('Monthly disbursement');
+      setPaybill('');
     } else {
       setMessage({ type: 'error', text: `❌ ${result.error}` });
     }
@@ -81,6 +93,7 @@ const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
     setSelectedFacility('');
     setAmount(385000);
     setReference('Monthly disbursement');
+    setPaybill('');
     setToken('');
     setMessage(null);
   };
@@ -111,8 +124,19 @@ const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
         </div>
 
         <div className="input-group">
-          <label>Paybill</label>
-          <input type="text" value={PAYBILL_NUMBER} readOnly />
+          <label>Paybill Number</label>
+          <input
+            type="text"
+            value={paybill}
+            onChange={(e) => setPaybill(e.target.value)}
+            required
+            placeholder={selectedFacilityData?.paybill ? "Auto-loaded from facility" : "Enter paybill number"}
+          />
+          {selectedFacilityData?.paybill && (
+            <small style={{ color: '#4CAF50', display: 'block', marginTop: '4px' }}>
+              ✓ Using facility paybill: {selectedFacilityData.paybill}
+            </small>
+          )}
         </div>
 
         <div className="input-group">
@@ -122,17 +146,17 @@ const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
             value={reference}
             onChange={(e) => setReference(e.target.value)}
             required
-            placeholder={selectedFacilityData?.accountReference ? "Auto-loaded from facility" : "Enter account reference"}
+            placeholder={selectedFacilityData?.account ? "Auto-loaded from facility" : "Enter account reference"}
           />
-          {selectedFacilityData?.accountReference && (
+          {selectedFacilityData?.account && (
             <small style={{ color: '#4CAF50', display: 'block', marginTop: '4px' }}>
-              ✓ Using facility account reference: {selectedFacilityData.accountReference}
+              ✓ Using facility account reference: {selectedFacilityData.account}
             </small>
           )}
         </div>
 
         <div className="input-group">
-          <label>Amount (USD)</label>
+          <label>Amount (KES)</label>
           <input
             type="number"
             step="1000"
