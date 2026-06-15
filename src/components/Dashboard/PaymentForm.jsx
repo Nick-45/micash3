@@ -4,33 +4,36 @@ import Alert from '../Common/Alert';
 
 const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
   const [selectedFacility, setSelectedFacility] = useState('');
-  const [amount, setAmount] = useState(385000);
+  const [amountUSD, setAmountUSD] = useState(385000);
   const [reference, setReference] = useState('Monthly disbursement');
   const [paybill, setPaybill] = useState('');
   const [token, setToken] = useState('');
   const [message, setMessage] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  // Exchange rate (1 USD = 129 KES)
+  const EXCHANGE_RATE = 129;
+  
+  // Calculate KES amount for display
+  const amountKES = Math.round(amountUSD * EXCHANGE_RATE);
+
   const selectedFacilityData = 
     selectedFacility !== '' ? MEDICAL_FACILITIES[selectedFacility] : null;
 
-  // ✅ Auto-update reference and paybill when facility changes
+  // Auto-update reference and paybill when facility changes
   useEffect(() => {
     if (selectedFacilityData) {
-      // Use facility's account reference
       if (selectedFacilityData.account) {
         setReference(selectedFacilityData.account);
       }
-      // Use facility's paybill number
       if (selectedFacilityData.paybill) {
         setPaybill(selectedFacilityData.paybill);
       }
     } else {
-      // Reset to default when no facility selected
       setReference('Monthly disbursement');
       setPaybill('');
     }
-  }, [selectedFacility]); // Runs when selectedFacility changes
+  }, [selectedFacility]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,7 +43,7 @@ const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
       return;
     }
 
-    if (amount <= 0) {
+    if (amountUSD <= 0) {
       setMessage({ type: 'error', text: 'Valid amount required' });
       return;
     }
@@ -63,11 +66,15 @@ const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
     setLoading(true);
     setMessage(null);
 
+    // Convert USD to KES before submitting
+    const amountKESValue = Math.round(amountUSD * EXCHANGE_RATE);
+
     const result = await onSubmit({
       facility: selectedFacilityData,
-      amount,
-      reference, // ✅ Uses facility's account reference or manual entry
-      paybill: paybill, // ✅ Uses facility's paybill number
+      amountUSD: amountUSD,
+      amountKES: amountKESValue,
+      reference,
+      paybill: paybill,
       account: reference,
       token
     });
@@ -75,9 +82,9 @@ const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
     if (result.success) {
       setMessage({
         type: 'success',
-        text: `Transaction queued (ID: ${result.transactionId})\nSent to Paybill ${paybill}\nAccount: ${reference}`
+        text: `✅ Transaction queued (ID: ${result.transactionId})\n📤 Sent to Paybill: ${paybill}\n📋 Account: ${reference}\n💰 Amount: ${amountUSD.toLocaleString()} USD (${amountKESValue.toLocaleString()} KES)`
       });
-      setAmount(385000);
+      setAmountUSD(385000);
       setSelectedFacility('');
       setReference('Monthly disbursement');
       setPaybill('');
@@ -86,12 +93,12 @@ const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
     }
 
     setLoading(false);
-    setTimeout(() => setMessage(null), 5000);
+    setTimeout(() => setMessage(null), 6000);
   };
 
   const handleReset = () => {
     setSelectedFacility('');
-    setAmount(385000);
+    setAmountUSD(385000);
     setReference('Monthly disbursement');
     setPaybill('');
     setToken('');
@@ -156,14 +163,20 @@ const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
         </div>
 
         <div className="input-group">
-          <label>Amount (KES)</label>
+          <label>Amount (USD)</label>
           <input
             type="number"
             step="1000"
-            value={amount}
-            onChange={(e) => setAmount(parseFloat(e.target.value))}
+            value={amountUSD}
+            onChange={(e) => setAmountUSD(parseFloat(e.target.value))}
             required
           />
+          {/* Show KES conversion in real-time */}
+          {amountUSD > 0 && (
+            <small style={{ color: '#D4AF37', display: 'block', marginTop: '4px' }}>
+              ≈ {amountKES.toLocaleString()} KES (Exchange rate: 1 USD = {EXCHANGE_RATE} KES)
+            </small>
+          )}
         </div>
 
         <div className="input-group">
@@ -179,7 +192,7 @@ const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
 
         <div style={{ display: 'flex', gap: '12px' }}>
           <button type="submit" style={{ flex: 2 }} disabled={loading || parentLoading}>
-            {loading || parentLoading ? 'Processing...' : 'Submit to Queue'}
+            {loading || parentLoading ? 'Processing...' : `Submit ${amountKES.toLocaleString()} KES`}
           </button>
           <button
             type="button"
