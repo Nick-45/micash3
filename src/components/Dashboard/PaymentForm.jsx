@@ -132,7 +132,7 @@ const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
         </div>
 
         <div className="input-group">
-          <label>Amount (KES)</label>
+          <label>Amount (USD)</label>
           <input
             type="number"
             step="1000"
