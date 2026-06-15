@@ -9,7 +9,6 @@ const Header = ({ user, onLogout }) => {
         <div className="logo-sub">DISBURSEMENT HUB</div>
       </div>
       <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-        <span className="paybill-badge">Paybill: {PAYBILL_NUMBER}</span>
         <span style={{ background: '#000000aa', padding: '8px 18px', borderRadius: '40px', color: '#D4AF37' }}>
            {user?.email}
         </span>
