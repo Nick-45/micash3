@@ -14,7 +14,7 @@ const StatsGrid = ({ balance, queueSize, token, onTokenExpiry }) => {
 
   // Timer countdown logic
   useEffect(() => {
-    if (!timerRunning || !expiryTime || !token) {
+    if (!timerRunning || !expiryTime) {
       return;
     }
 
@@ -51,14 +51,9 @@ const StatsGrid = ({ balance, queueSize, token, onTokenExpiry }) => {
     const interval = setInterval(updateTimer, 1000);
 
     return () => clearInterval(interval);
-  }, [timerRunning, expiryTime, token, onTokenExpiry]);
+  }, [timerRunning, expiryTime, onTokenExpiry]);
 
   const handleStartTimer = () => {
-    if (!token) {
-      alert('Please enter an access token first');
-      return;
-    }
-
     const totalSeconds = (hours * 3600) + (minutes * 60) + seconds;
     
     if (totalSeconds === 0) {
@@ -179,8 +174,8 @@ const StatsGrid = ({ balance, queueSize, token, onTokenExpiry }) => {
           </div>
         )}
         
-        {/* Timer Input Controls - Only show when timer is not running */}
-        {!timerRunning && token && tokenStatus !== 'expired' && (
+        {/* Timer Input Controls - Only hidden when timer is running */}
+        {!timerRunning && (
           <div style={{ marginTop: '12px' }}>
             <div style={{ fontSize: '0.75rem', color: '#888', marginBottom: '6px' }}>
               Set Timer Duration
@@ -358,8 +353,8 @@ const StatsGrid = ({ balance, queueSize, token, onTokenExpiry }) => {
           </div>
         )}
         
-        {/* Action Buttons */}
-        {token && !timerRunning && tokenStatus !== 'expired' && (
+        {/* Action Buttons - Start/Reset when timer not running */}
+        {!timerRunning && (
           <div style={{ display: 'flex', gap: '6px', marginTop: '10px' }}>
             <button
               onClick={handleStartTimer}
@@ -417,41 +412,10 @@ const StatsGrid = ({ balance, queueSize, token, onTokenExpiry }) => {
           </div>
         )}
         
-        {/* Expired warning */}
-        {tokenStatus === 'expired' && token && (
-          <div style={{ marginTop: '8px' }}>
-            <div style={{ fontSize: '0.8rem', color: '#f44336', marginBottom: '6px' }}>
-              ⚠️ Token expired. Please refresh.
-            </div>
-            <button
-              onClick={handleResetTimer}
-              style={{
-                width: '100%',
-                padding: '5px',
-                background: '#ff9800',
-                border: 'none',
-                borderRadius: '4px',
-                color: 'white',
-                fontSize: '0.75rem',
-                cursor: 'pointer'
-              }}
-            >
-              Set New Timer
-            </button>
-          </div>
-        )}
-        
         {/* Token preview */}
         {token && (
           <div className="token-sim" style={{ marginTop: '8px', fontSize: '0.7rem', color: '#888' }}>
             Token: {token.substring(0, 15)}...
-          </div>
-        )}
-        
-        {/* No token warning */}
-        {!token && (
-          <div style={{ marginTop: '8px', fontSize: '0.8rem', color: '#ff9800' }}>
-            ⚠️ No token set. Enter token to proceed.
           </div>
         )}
       </div>
