@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MEDICAL_FACILITIES, PAYMENT_CHANNELS } from '../../constants';
+import { MEDICAL_FACILITIES } from '../../constants';
 import Alert from '../Common/Alert';
 
 const PAYBILL_NUMBER = "522522"; // ✅ Fixed shortcode
@@ -8,7 +8,6 @@ const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
   const [selectedFacility, setSelectedFacility] = useState('');
   const [amount, setAmount] = useState(385000);
   const [reference, setReference] = useState('Monthly disbursement');
-  const [channel, setChannel] = useState('Pesalink');
   const [token, setToken] = useState('');
   const [message, setMessage] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -83,7 +82,6 @@ const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
     setSelectedFacility('');
     setAmount(385000);
     setReference('Monthly disbursement');
-    setChannel('Pesalink');
     setToken('');
     setMessage(null);
   };
@@ -143,17 +141,6 @@ const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
             onChange={(e) => setAmount(parseFloat(e.target.value))}
             required
           />
-        </div>
-
-        <div className="input-group">
-          <label>Payment Channel</label>
-          <select value={channel} onChange={(e) => setChannel(e.target.value)}>
-            {PAYMENT_CHANNELS.map((ch) => (
-              <option key={ch.value} value={ch.value}>
-                {ch.label}
-              </option>
-            ))}
-          </select>
         </div>
 
         <div className="input-group">
