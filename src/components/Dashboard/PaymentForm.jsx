@@ -56,7 +56,6 @@ const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
       facility: selectedFacilityData,
       amount,
       reference, // ✅ Uses facility's account reference or manual entry
-      channel,
       paybill: PAYBILL_NUMBER,
       account: reference,
       token
