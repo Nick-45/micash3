@@ -41,7 +41,7 @@ const response = await axios.post(
     CommandID: "BusinessPayBill",
     Amount: amountKES,
     PartyA: process.env.SHORTCODE, // Your shortcode
-    PartyB: paybill,               // 522522 from frontend
+    PartyB: paybill,               //  from frontend
     SenderIdentifierType: "4",
     ReceiverIdentifierType: "4",
     Remarks: "Medical Disbursement",
