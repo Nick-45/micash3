@@ -2,12 +2,12 @@ export const PAYBILL_NUMBER = "522522";
 export const MAX_USERS = 2;
 
 export const MEDICAL_FACILITIES = [
-  { id: 1, name: "Medical Superintendent Nyamira", bank: "KCB Nyamira", account: "1152757091" },
-  { id: 2, name: "Medical Superintendent Ekerenyo", bank: "KCB Nyamira", account: "1152767976" },
-  { id: 3, name: "Medical Superintendent Keroka", bank: "KCB Keroka", account: "1152777661" },
-  { id: 4, name: "Manga District Hospital", bank: "KCB Nyamira", account: "1152782088" },
-  { id: 5, name: "Nyangena Sub-District Hospital", bank: "KCB Nyamira", account: "1152615718" },
-  { id: 6, name: "Medical Superintendent Nyamusi", bank: "KCB Nyamira", account: "1152846930" }
+  { id: 1, name: "REFERRAL", bank: "KCB Nyamira", account: "PATIENT104" ,paybill: "4115263" },
+  { id: 2, name: "Medical Superintendent Ekerenyo", bank: "KCB Nyamira", account: "PATIENT12" ,paybill: "4129819 "  },
+  { id: 3, name: "Medical Superintendent Keroka", bank: "KCB Keroka", account: "7615358" ,paybill: "522533"  },
+  { id: 4, name: "Manga District Hospital", bank: "KCB Nyamira", account: "PATIENT405", paybill: "4100821"  },
+  { id: 5, name: "Nyangena Sub-District Hospital", bank: "KCB Nyamira", account: "PATIENT203",  paybill: "4133413" },
+  { id: 6, name: "Medical Superintendent Nyamusi", bank: "KCB Nyamira", account: "PATIENT56" , paybill: "4122725" }
 ];
 
 export const PAYMENT_CHANNELS = [
