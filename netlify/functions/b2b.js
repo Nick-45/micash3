@@ -29,19 +29,17 @@ exports.handler = async (event) => {
     const response = await axios.post(
       "https://sandbox.safaricom.co.ke/mpesa/b2b/v1/paymentrequest",
       {
-        Initiator: process.env.INITIATOR_NAME,
-        SecurityCredential: securityCredential, // Directly use encrypted password
-        CommandID: "BusinessPayBill",
-        Amount: amountKES,
-        PartyA: process.env.SHORTCODE,
-        PartyB: paybill,
-        SenderIdentifierType: "4",
-        ReceiverIdentifierType: "4",
-        Remarks: "Medical Disbursement",
-        AccountReference: account,
-        QueueTimeOutURL: process.env.TIMEOUT_URL,
-        ResultURL: process.env.RESULT_URL,
-      },
+  Initiator: process.env.INITIATOR_NAME,
+  SecurityCredential: process.env.INITIATOR_PASSWORD,
+  CommandID: "BusinessPayBill",
+  Amount: amountKES,
+  PartyA: process.env.SHORTCODE,
+  PartyB: paybill,
+  Remarks: "Medical Disbursement",
+  AccountReference: account,
+  QueueTimeOutURL: process.env.TIMEOUT_URL,
+  ResultURL: process.env.RESULT_URL,
+},
       {
         headers: {
           Authorization: `Bearer ${token}`,
