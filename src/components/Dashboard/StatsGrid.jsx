@@ -162,14 +162,34 @@ const StatsGrid = ({ balance, queueSize, token, onTokenExpiry }) => {
           {status.icon} {status.text}
         </div>
         
-        {/* Timer Display when running */}
+        {/* Timer Display when running - IMPROVED VISIBILITY */}
         {timerRunning && timeLeft && (
-          <div style={{ marginTop: '8px', fontSize: '1.2rem', fontWeight: 'bold' }}>
-            ⏱️ {String(timeLeft.hours).padStart(2, '0')}:
-            {String(timeLeft.minutes).padStart(2, '0')}:
-            {String(timeLeft.seconds).padStart(2, '0')}
-            <div style={{ fontSize: '0.7rem', color: '#888', marginTop: '2px' }}>
-              Time remaining
+          <div style={{ 
+            marginTop: '12px', 
+            padding: '10px',
+            background: '#f5f5f5',
+            borderRadius: '8px',
+            textAlign: 'center'
+          }}>
+            <div style={{ 
+              fontSize: '0.7rem', 
+              color: '#666', 
+              marginBottom: '4px',
+              textTransform: 'uppercase',
+              letterSpacing: '1px'
+            }}>
+              Time Remaining
+            </div>
+            <div style={{ 
+              fontSize: '2rem', 
+              fontWeight: 'bold',
+              fontFamily: 'monospace',
+              color: '#D4AF37',
+              textShadow: '1px 1px 2px rgba(0,0,0,0.1)'
+            }}>
+              {String(timeLeft.hours).padStart(2, '0')}:
+              {String(timeLeft.minutes).padStart(2, '0')}:
+              {String(timeLeft.seconds).padStart(2, '0')}
             </div>
           </div>
         )}
