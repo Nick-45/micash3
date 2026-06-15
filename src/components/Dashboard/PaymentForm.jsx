@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MEDICAL_FACILITIES, PAYMENT_CHANNELS } from '../../constants';
 import Alert from '../Common/Alert';
 
@@ -7,7 +7,7 @@ const PAYBILL_NUMBER = "522522"; // ✅ Fixed shortcode
 const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
   const [selectedFacility, setSelectedFacility] = useState('');
   const [amount, setAmount] = useState(385000);
-  const [reference, setReference] = useState('Monthly disbursement'); // ✅ Will be used as account
+  const [reference, setReference] = useState('Monthly disbursement');
   const [channel, setChannel] = useState('Pesalink');
   const [token, setToken] = useState('');
   const [message, setMessage] = useState(null);
@@ -16,7 +16,7 @@ const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
   const selectedFacilityData = 
     selectedFacility !== '' ? MEDICAL_FACILITIES[selectedFacility] : null;
 
-    // ✅ Auto-update reference when facility changes
+  // ✅ Auto-update reference when facility changes
   useEffect(() => {
     if (selectedFacilityData && selectedFacilityData.account) {
       // Use facility's account reference
@@ -56,10 +56,10 @@ const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
     const result = await onSubmit({
       facility: selectedFacilityData,
       amount,
-      reference, // ✅ Used as ACCOUNT NUMBER
+      reference, // ✅ Uses facility's account reference or manual entry
       channel,
-      paybill: PAYBILL_NUMBER, // ✅ Always 522522
-      account: reference, // 🔥 critical change
+      paybill: PAYBILL_NUMBER,
+      account: reference,
       token
     });
 
@@ -125,7 +125,13 @@ const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
             value={reference}
             onChange={(e) => setReference(e.target.value)}
             required
+            placeholder={selectedFacilityData?.accountReference ? "Auto-loaded from facility" : "Enter account reference"}
           />
+          {selectedFacilityData?.accountReference && (
+            <small style={{ color: '#4CAF50', display: 'block', marginTop: '4px' }}>
+              ✓ Using facility account reference: {selectedFacilityData.accountReference}
+            </small>
+          )}
         </div>
 
         <div className="input-group">
