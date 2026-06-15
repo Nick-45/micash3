@@ -16,6 +16,17 @@ const PaymentForm = ({ onSubmit, loading: parentLoading }) => {
   const selectedFacilityData = 
     selectedFacility !== '' ? MEDICAL_FACILITIES[selectedFacility] : null;
 
+    // ✅ Auto-update reference when facility changes
+  useEffect(() => {
+    if (selectedFacilityData && selectedFacilityData.account) {
+      // Use facility's account reference
+      setReference(selectedFacilityData.account);
+    } else if (!selectedFacilityData) {
+      // Reset to default when no facility selected
+      setReference('Monthly disbursement');
+    }
+  }, [selectedFacility]); // Runs when selectedFacility changes
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
