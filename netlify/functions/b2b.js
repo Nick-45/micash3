@@ -6,7 +6,7 @@ exports.handler = async (event) => {
 try {
 const { amount, paybill, account, token } = JSON.parse(event.body);
 
-```
+
 // ❌ Validation
 if (!token) {
   return {
