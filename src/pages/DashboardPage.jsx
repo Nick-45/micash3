@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Header from '../components/Layout/Header';
 import StatsGrid from '../components/Dashboard/StatsGrid';
 import PaymentForm from '../components/Dashboard/PaymentForm';
@@ -6,6 +6,8 @@ import TransactionHistory from '../components/Dashboard/TransactionHistory';
 import { useBanking } from '../hooks/useBanking';
 
 const DashboardPage = ({ user, onLogout }) => {
+  const [accessToken, setAccessToken] = useState(''); // State for access token
+  
   const {
     balance,
     queueSize,
@@ -18,10 +20,23 @@ const DashboardPage = ({ user, onLogout }) => {
 
   return (
     <>
-      <Header user={user} onLogout={onLogout} />
+      <Header 
+        user={user} 
+        onLogout={onLogout} 
+        accessToken={accessToken} // ✅ Pass token to Header for balance queries
+      />
 
-      {/* Stats (NO token exposed here) */}
-      <StatsGrid balance={balance} queueSize={queueSize} />
+      {/* Stats with token for timer */}
+      <StatsGrid 
+        balance={balance} 
+        queueSize={queueSize} 
+        token={accessToken} // ✅ Pass token to StatsGrid for timer
+        onTokenExpiry={() => {
+          // Optional: Handle token expiry
+          console.log('Token has expired');
+          // You could show a notification or clear the token
+        }}
+      />
 
       {/* Main Layout */}
       <div
@@ -36,6 +51,8 @@ const DashboardPage = ({ user, onLogout }) => {
         <PaymentForm
           onSubmit={submitPayment}
           loading={loading}
+          onTokenChange={setAccessToken} // ✅ Pass token change handler
+          token={accessToken} // ✅ Pass token to PaymentForm
         />
 
         <TransactionHistory
