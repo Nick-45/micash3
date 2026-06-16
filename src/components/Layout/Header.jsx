@@ -6,9 +6,10 @@ const Header = ({ user, onLogout }) => {
   const [error, setError] = useState(null);
   const [accessToken, setAccessToken] = useState('');
   const [showTokenInput, setShowTokenInput] = useState(false);
+  const [debugInfo, setDebugInfo] = useState(null);
 
   // Get paybill number from environment variable
-  const PAYBILL_NUMBER = process.env.SHORTCODE;
+  const PAYBILL_NUMBER = process.env.REACT_APP_PAYBILL_NUMBER || '522522';
 
   // Fetch paybill balance from the backend
   const fetchPaybillBalance = async () => {
@@ -24,8 +25,11 @@ const Header = ({ user, onLogout }) => {
     
     setLoading(true);
     setError(null);
+    setDebugInfo(null);
     
     try {
+      console.log('Fetching balance with token:', accessToken.substring(0, 10) + '...');
+      
       const response = await fetch('/.netlify/functions/get-paybill-balance', {
         method: 'POST',
         headers: {
@@ -34,22 +38,24 @@ const Header = ({ user, onLogout }) => {
         body: JSON.stringify({
           paybill: PAYBILL_NUMBER,
           userId: user.uid,
-          accessToken: accessToken // ✅ Pass the token from the input
+          accessToken: accessToken
         })
       });
       
       const data = await response.json();
+      console.log('Response data:', data);
+      setDebugInfo(data);
       
       if (data.success) {
         setPaybillBalance(data.balance);
         setError(null);
-        // Auto-hide token input after successful fetch
         setShowTokenInput(false);
       } else {
         setError(data.error || 'Failed to fetch balance');
         setPaybillBalance(null);
       }
     } catch (err) {
+      console.error('Fetch error:', err);
       setError(err.message || 'Network error');
       setPaybillBalance(null);
     } finally {
@@ -89,15 +95,15 @@ const Header = ({ user, onLogout }) => {
           display: 'flex',
           alignItems: 'center',
           gap: '12px',
-          flexWrap: 'wrap'
+          flexWrap: 'wrap',
+          minWidth: '200px'
         }}>
           <span style={{ color: '#D4AF37', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
             Paybill {PAYBILL_NUMBER}
           </span>
           
-          {/* Token Input - Toggleable */}
           {showTokenInput ? (
-            <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
               <input
                 type="text"
                 value={accessToken}
@@ -201,6 +207,20 @@ const Header = ({ user, onLogout }) => {
             </>
           )}
         </div>
+        
+        {/* Debug Info - Show only in development or when error */}
+        {debugInfo && (
+          <div style={{
+            fontSize: '0.6rem',
+            color: '#888',
+            maxWidth: '300px',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap'
+          }}>
+            Debug: {JSON.stringify(debugInfo).substring(0, 100)}
+          </div>
+        )}
         
         <span style={{ background: '#000000aa', padding: '8px 18px', borderRadius: '40px', color: '#D4AF37' }}>
           {user?.email}
