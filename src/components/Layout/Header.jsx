@@ -1,14 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { PAYBILL_NUMBER } from '../../constants';
 
-const Header = ({ user, onLogout }) => {
+const Header = ({ user, onLogout, accessToken }) => {
   const [paybillBalance, setPaybillBalance] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Get paybill number from environment variable
+  const PAYBILL_NUMBER = process.env.SHORTCODE ;
+
   // Fetch paybill balance from the backend
   const fetchPaybillBalance = async () => {
-    if (!user) return;
+    if (!user) {
+      setError('User not authenticated');
+      return;
+    }
+    
+    if (!accessToken) {
+      setError('Access token required');
+      setPaybillBalance(null);
+      return;
+    }
     
     setLoading(true);
     setError(null);
@@ -21,7 +32,8 @@ const Header = ({ user, onLogout }) => {
         },
         body: JSON.stringify({
           paybill: PAYBILL_NUMBER,
-          userId: user.uid
+          userId: user.uid,
+          accessToken: accessToken // ✅ Pass the access token from frontend
         })
       });
       
@@ -31,25 +43,31 @@ const Header = ({ user, onLogout }) => {
         setPaybillBalance(data.balance);
       } else {
         setError(data.error || 'Failed to fetch balance');
+        setPaybillBalance(null);
       }
     } catch (err) {
       setError(err.message || 'Network error');
+      setPaybillBalance(null);
     } finally {
       setLoading(false);
     }
   };
 
-  // Fetch balance on component mount and periodically refresh
+  // Fetch balance on component mount and when accessToken changes
   useEffect(() => {
-    if (user) {
+    if (user && accessToken) {
       fetchPaybillBalance();
       
       // Refresh every 30 seconds
       const interval = setInterval(fetchPaybillBalance, 30000);
       
       return () => clearInterval(interval);
+    } else {
+      // Reset balance when token is not available
+      setPaybillBalance(null);
+      setError(!accessToken ? 'Access token required' : null);
     }
-  }, [user]);
+  }, [user, accessToken]);
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-KE', {
@@ -87,11 +105,15 @@ const Header = ({ user, onLogout }) => {
           <span style={{ color: '#D4AF37', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
             Paybill {PAYBILL_NUMBER}
           </span>
-          <span style={{ color: '#4caf50', fontWeight: 'bold' }}>
+          <span style={{ 
+            color: error ? '#f44336' : '#4caf50', 
+            fontWeight: 'bold',
+            fontSize: error ? '0.7rem' : 'inherit'
+          }}>
             {loading ? (
               <span style={{ color: '#888' }}>Loading...</span>
             ) : error ? (
-              <span style={{ color: '#f44336', fontSize: '0.7rem' }}>⚠️ Error</span>
+              <span>⚠️ {error}</span>
             ) : paybillBalance !== null ? (
               formatCurrency(paybillBalance)
             ) : (
@@ -108,8 +130,11 @@ const Header = ({ user, onLogout }) => {
                 cursor: 'pointer',
                 fontSize: '0.8rem',
                 padding: '2px 6px',
-                borderRadius: '4px'
+                borderRadius: '4px',
+                transition: 'all 0.2s'
               }}
+              onMouseEnter={(e) => e.target.style.color = '#D4AF37'}
+              onMouseLeave={(e) => e.target.style.color = '#888'}
               title="Refresh balance"
             >
               🔄
