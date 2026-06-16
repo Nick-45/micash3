@@ -9,7 +9,7 @@ const Header = ({ user, onLogout }) => {
   const [debugInfo, setDebugInfo] = useState(null);
 
   // Get paybill number from environment variable
-  const PAYBILL_NUMBER = process.env.REACT_APP_SHORTCODE || process.env.SHORTCODE || '522522';
+  const PAYBILL_NUMBER = process.env.SHORTCODE || '600000';
 
   // Fetch paybill balance from the backend
   const fetchPaybillBalance = async () => {
