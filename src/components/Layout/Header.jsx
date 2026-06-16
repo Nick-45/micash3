@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 
-const Header = ({ user, onLogout, accessToken }) => {
+const Header = ({ user, onLogout }) => {
   const [paybillBalance, setPaybillBalance] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [accessToken, setAccessToken] = useState('');
+  const [showTokenInput, setShowTokenInput] = useState(false);
 
   // Get paybill number from environment variable
-  const PAYBILL_NUMBER = process.env.SHORTCODE ;
+  const PAYBILL_NUMBER = process.env.REACT_APP_PAYBILL_NUMBER || '522522';
 
   // Fetch paybill balance from the backend
   const fetchPaybillBalance = async () => {
@@ -16,8 +18,7 @@ const Header = ({ user, onLogout, accessToken }) => {
     }
     
     if (!accessToken) {
-      setError('Access token required');
-      setPaybillBalance(null);
+      setError('Please enter an access token');
       return;
     }
     
@@ -33,7 +34,7 @@ const Header = ({ user, onLogout, accessToken }) => {
         body: JSON.stringify({
           paybill: PAYBILL_NUMBER,
           userId: user.uid,
-          accessToken: accessToken // ✅ Pass the access token from frontend
+          accessToken: accessToken // ✅ Pass the token from the input
         })
       });
       
@@ -41,6 +42,9 @@ const Header = ({ user, onLogout, accessToken }) => {
       
       if (data.success) {
         setPaybillBalance(data.balance);
+        setError(null);
+        // Auto-hide token input after successful fetch
+        setShowTokenInput(false);
       } else {
         setError(data.error || 'Failed to fetch balance');
         setPaybillBalance(null);
@@ -52,22 +56,6 @@ const Header = ({ user, onLogout, accessToken }) => {
       setLoading(false);
     }
   };
-
-  // Fetch balance on component mount and when accessToken changes
-  useEffect(() => {
-    if (user && accessToken) {
-      fetchPaybillBalance();
-      
-      // Refresh every 30 seconds
-      const interval = setInterval(fetchPaybillBalance, 30000);
-      
-      return () => clearInterval(interval);
-    } else {
-      // Reset balance when token is not available
-      setPaybillBalance(null);
-      setError(!accessToken ? 'Access token required' : null);
-    }
-  }, [user, accessToken]);
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-KE', {
@@ -100,45 +88,117 @@ const Header = ({ user, onLogout, accessToken }) => {
           border: '1px solid #D4AF37',
           display: 'flex',
           alignItems: 'center',
-          gap: '12px'
+          gap: '12px',
+          flexWrap: 'wrap'
         }}>
           <span style={{ color: '#D4AF37', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
             Paybill {PAYBILL_NUMBER}
           </span>
-          <span style={{ 
-            color: error ? '#f44336' : '#4caf50', 
-            fontWeight: 'bold',
-            fontSize: error ? '0.7rem' : 'inherit'
-          }}>
-            {loading ? (
-              <span style={{ color: '#888' }}>Loading...</span>
-            ) : error ? (
-              <span>⚠️ {error}</span>
-            ) : paybillBalance !== null ? (
-              formatCurrency(paybillBalance)
-            ) : (
-              <span style={{ color: '#888' }}>N/A</span>
-            )}
-          </span>
-          {!loading && !error && paybillBalance !== null && (
-            <button
-              onClick={fetchPaybillBalance}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: '#888',
-                cursor: 'pointer',
-                fontSize: '0.8rem',
-                padding: '2px 6px',
-                borderRadius: '4px',
-                transition: 'all 0.2s'
-              }}
-              onMouseEnter={(e) => e.target.style.color = '#D4AF37'}
-              onMouseLeave={(e) => e.target.style.color = '#888'}
-              title="Refresh balance"
-            >
-              🔄
-            </button>
+          
+          {/* Token Input - Toggleable */}
+          {showTokenInput ? (
+            <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+              <input
+                type="text"
+                value={accessToken}
+                onChange={(e) => setAccessToken(e.target.value)}
+                placeholder="Enter access token"
+                style={{
+                  padding: '4px 10px',
+                  borderRadius: '20px',
+                  border: '1px solid #D4AF37',
+                  background: 'rgba(255,255,255,0.1)',
+                  color: 'white',
+                  fontSize: '0.75rem',
+                  width: '200px'
+                }}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    fetchPaybillBalance();
+                  }
+                }}
+              />
+              <button
+                onClick={fetchPaybillBalance}
+                disabled={loading}
+                style={{
+                  padding: '4px 12px',
+                  background: '#4caf50',
+                  border: 'none',
+                  borderRadius: '20px',
+                  color: 'white',
+                  cursor: 'pointer',
+                  fontSize: '0.7rem',
+                  fontWeight: 'bold'
+                }}
+              >
+                {loading ? '...' : 'Check'}
+              </button>
+              <button
+                onClick={() => setShowTokenInput(false)}
+                style={{
+                  padding: '4px 8px',
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#888',
+                  cursor: 'pointer',
+                  fontSize: '0.8rem'
+                }}
+              >
+                ✕
+              </button>
+            </div>
+          ) : (
+            <>
+              <span style={{ color: error ? '#f44336' : '#4caf50', fontWeight: 'bold' }}>
+                {loading ? (
+                  <span style={{ color: '#888' }}>Loading...</span>
+                ) : error ? (
+                  <span style={{ fontSize: '0.7rem' }}>⚠️ {error}</span>
+                ) : paybillBalance !== null ? (
+                  formatCurrency(paybillBalance)
+                ) : (
+                  <span style={{ color: '#888' }}>N/A</span>
+                )}
+              </span>
+              
+              {!loading && (
+                <>
+                  <button
+                    onClick={() => setShowTokenInput(true)}
+                    style={{
+                      background: 'transparent',
+                      border: '1px solid #D4AF37',
+                      color: '#D4AF37',
+                      cursor: 'pointer',
+                      fontSize: '0.6rem',
+                      padding: '2px 10px',
+                      borderRadius: '12px'
+                    }}
+                    title="Enter token to check balance"
+                  >
+                    🔑 Enter Token
+                  </button>
+                  {!error && paybillBalance !== null && (
+                    <button
+                      onClick={fetchPaybillBalance}
+                      style={{
+                        background: 'transparent',
+                        border: 'none',
+                        color: '#888',
+                        cursor: 'pointer',
+                        fontSize: '0.8rem',
+                        padding: '2px 6px',
+                        borderRadius: '4px'
+                      }}
+                      title="Refresh balance"
+                    >
+                      🔄
+                    </button>
+                  )}
+                </>
+              )}
+            </>
           )}
         </div>
         
