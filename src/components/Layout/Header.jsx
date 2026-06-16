@@ -9,7 +9,7 @@ const Header = ({ user, onLogout }) => {
   const [debugInfo, setDebugInfo] = useState(null);
 
   // Get paybill number from environment variable
-  const PAYBILL_NUMBER = process.env.SHORTCODE;
+  const PAYBILL_NUMBER = process.env.REACT_APP_SHORTCODE || process.env.SHORTCODE || '522522';
 
   // Fetch paybill balance from the backend
   const fetchPaybillBalance = async () => {
@@ -29,6 +29,7 @@ const Header = ({ user, onLogout }) => {
     
     try {
       console.log('Fetching balance with token:', accessToken.substring(0, 10) + '...');
+      console.log('Paybill number:', PAYBILL_NUMBER);
       
       const response = await fetch('/.netlify/functions/get-paybill-balance', {
         method: 'POST',
@@ -118,7 +119,7 @@ const Header = ({ user, onLogout }) => {
                   fontSize: '0.75rem',
                   width: '200px'
                 }}
-                onKeyPress={(e) => {
+                onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     fetchPaybillBalance();
                   }
@@ -156,7 +157,7 @@ const Header = ({ user, onLogout }) => {
             </div>
           ) : (
             <>
-              <span style={{ color: error ? '#f44336' : '#4caf50', fontWeight: 'bold' }}>
+              <span style={{ color: error ? '#f44336' : '#4caf50', fontWeight: 'bold', fontSize: '0.9rem' }}>
                 {loading ? (
                   <span style={{ color: '#888' }}>Loading...</span>
                 ) : error ? (
@@ -164,59 +165,61 @@ const Header = ({ user, onLogout }) => {
                 ) : paybillBalance !== null ? (
                   formatCurrency(paybillBalance)
                 ) : (
-                  <span style={{ color: '#888' }}>N/A</span>
+                  <span style={{ color: '#888' }}>Enter Token</span>
                 )}
               </span>
               
+              {!loading && !error && paybillBalance !== null && (
+                <button
+                  onClick={fetchPaybillBalance}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: '#888',
+                    cursor: 'pointer',
+                    fontSize: '0.8rem',
+                    padding: '2px 6px',
+                    borderRadius: '4px'
+                  }}
+                  title="Refresh balance"
+                >
+                  🔄
+                </button>
+              )}
+              
               {!loading && (
-                <>
-                  <button
-                    onClick={() => setShowTokenInput(true)}
-                    style={{
-                      background: 'transparent',
-                      border: '1px solid #D4AF37',
-                      color: '#D4AF37',
-                      cursor: 'pointer',
-                      fontSize: '0.6rem',
-                      padding: '2px 10px',
-                      borderRadius: '12px'
-                    }}
-                    title="Enter token to check balance"
-                  >
-                    🔑 Enter Token
-                  </button>
-                  {!error && paybillBalance !== null && (
-                    <button
-                      onClick={fetchPaybillBalance}
-                      style={{
-                        background: 'transparent',
-                        border: 'none',
-                        color: '#888',
-                        cursor: 'pointer',
-                        fontSize: '0.8rem',
-                        padding: '2px 6px',
-                        borderRadius: '4px'
-                      }}
-                      title="Refresh balance"
-                    >
-                      🔄
-                    </button>
-                  )}
-                </>
+                <button
+                  onClick={() => setShowTokenInput(true)}
+                  style={{
+                    background: 'transparent',
+                    border: '1px solid #D4AF37',
+                    color: '#D4AF37',
+                    cursor: 'pointer',
+                    fontSize: '0.6rem',
+                    padding: '2px 10px',
+                    borderRadius: '12px'
+                  }}
+                  title="Enter token to check balance"
+                >
+                  🔑 Enter Token
+                </button>
               )}
             </>
           )}
         </div>
         
-        {/* Debug Info - Show only in development or when error */}
-        {debugInfo && (
+        {/* Debug Info - Show only when needed */}
+        {debugInfo && process.env.NODE_ENV === 'development' && (
           <div style={{
             fontSize: '0.6rem',
             color: '#888',
             maxWidth: '300px',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap'
+            whiteSpace: 'nowrap',
+            background: 'rgba(0,0,0,0.5)',
+            padding: '4px 8px',
+            borderRadius: '4px'
           }}>
             Debug: {JSON.stringify(debugInfo).substring(0, 100)}
           </div>
