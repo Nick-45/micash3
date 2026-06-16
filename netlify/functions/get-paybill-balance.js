@@ -29,7 +29,7 @@ exports.handler = async (event) => {
         statusCode: 400,
         body: JSON.stringify({ 
           success: false, 
-          error: 'Access token is required' 
+          error: 'Access token is required. Please enter a valid Daraja access token.' 
         })
       };
     }
@@ -51,10 +51,8 @@ exports.handler = async (event) => {
     });
     
     // Parse the balance from the response
-    // The response format may vary, adjust accordingly
     let balance = 0;
     if (response.data) {
-      // Different possible response formats
       if (response.data.Balance) {
         // Extract numeric value from "KES 1,234.56" format
         const balanceStr = response.data.Balance;
@@ -80,26 +78,29 @@ exports.handler = async (event) => {
     
     // Handle specific error cases
     let errorMessage = 'Failed to fetch balance';
+    let statusCode = 500;
+    
     if (error.response) {
-      // The request was made and the server responded with a status code
-      // that falls out of the range of 2xx
       console.error('Response data:', error.response.data);
       console.error('Response status:', error.response.status);
       
+      statusCode = error.response.status;
+      
       if (error.response.status === 401) {
-        errorMessage = 'Invalid or expired access token';
+        errorMessage = 'Invalid or expired access token. Please get a new token.';
       } else if (error.response.status === 403) {
-        errorMessage = 'Unauthorized - Check your credentials';
+        errorMessage = 'Unauthorized - Check your credentials and permissions.';
       } else if (error.response.data?.errorMessage) {
         errorMessage = error.response.data.errorMessage;
+      } else if (error.response.data?.errorCode) {
+        errorMessage = `Error ${error.response.data.errorCode}: ${error.response.data.errorMessage || 'Unknown error'}`;
       }
     } else if (error.request) {
-      // The request was made but no response was received
-      errorMessage = 'No response from Safaricom API';
+      errorMessage = 'No response from Safaricom API. Please check your network connection.';
     }
     
     return {
-      statusCode: error.response?.status || 500,
+      statusCode: statusCode,
       body: JSON.stringify({
         success: false,
         error: errorMessage,
