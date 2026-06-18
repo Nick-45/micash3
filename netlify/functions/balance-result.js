@@ -51,8 +51,8 @@ exports.handler = async (event) => {
       }
     }
     
-    // You can store this balance in Firebase or your database here
-    // Example: await updateDoc(doc(db, 'users', userId), { paybillBalance: balance });
+    // store this balance in Firebase 
+     await updateDoc(doc(db, 'users', userId), { paybillBalance: balance });
     
     return {
       statusCode: 200,
