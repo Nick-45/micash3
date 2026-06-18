@@ -48,9 +48,9 @@ exports.handler = async (event) => {
 
     console.log('Calling Safaricom API with paybill:', paybill);
     
-    // ✅ Generate SecurityCredential (you need to implement this)
-    // For testing, you can use a placeholder, but in production you need proper encryption
-    const securityCredential = process.env.SECURITY_CREDENTIAL || 'your_encrypted_password';
+
+    
+    const securityCredential = process.env.INITIATOR_PASSWORD || 'your_encrypted_password';
     
     // ✅ The complete request body for Account Balance API
     const requestData = {
@@ -60,8 +60,8 @@ exports.handler = async (event) => {
       'PartyA': paybill,
       'IdentifierType': '4',
       'Remarks': 'Balance Query',
-      'QueueTimeOutURL': process.env.QUEUE_TIMEOUT_URL || 'https://your-site.netlify.app/.netlify/functions/timeout',
-      'ResultURL': process.env.RESULT_URL || 'https://your-site.netlify.app/.netlify/functions/balance-result'
+      'QueueTimeOutURL': process.env.QUEUE_TIMEOUT_URL || 'https://micash3.netlify.app/.netlify/functions/timeout',
+      'ResultURL': process.env.RESULT_URL || 'https://micash3.netlify.app/.netlify/functions/balance-result'
     };
     
     console.log('Request data (excluding SecurityCredential):', {
