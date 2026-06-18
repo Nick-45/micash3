@@ -48,54 +48,86 @@ exports.handler = async (event) => {
 
     console.log('Calling Safaricom API with paybill:', paybill);
     
-    // Call Safaricom API to get paybill balance
+    // ✅ Generate SecurityCredential (you need to implement this)
+    // For testing, you can use a placeholder, but in production you need proper encryption
+    const securityCredential = process.env.SECURITY_CREDENTIAL || 'your_encrypted_password';
+    
+    // ✅ The complete request body for Account Balance API
+    const requestData = {
+      'Initiator': process.env.INITIATOR_NAME || 'testapi',
+      'SecurityCredential': securityCredential,
+      'CommandID': 'AccountBalance',
+      'PartyA': paybill,
+      'IdentifierType': '4',
+      'Remarks': 'Balance Query',
+      'QueueTimeOutURL': process.env.QUEUE_TIMEOUT_URL || 'https://your-site.netlify.app/.netlify/functions/timeout',
+      'ResultURL': process.env.RESULT_URL || 'https://your-site.netlify.app/.netlify/functions/balance-result'
+    };
+    
+    console.log('Request data (excluding SecurityCredential):', {
+      ...requestData,
+      SecurityCredential: '***HIDDEN***'
+    });
+    
+    // ✅ Call Safaricom API with complete data
     const response = await axios({
-      method: 'GET',
+      method: 'POST',
       url: 'https://sandbox.safaricom.co.ke/mpesa/accountbalance/v1/query',
       headers: {
         'Authorization': `Bearer ${accessToken}`,
         'Content-Type': 'application/json'
       },
-      params: {
-        'CommandID': 'AccountBalance',
-        'PartyA': paybill,
-        'IdentifierType': '4',
-        'Remarks': 'Balance Query'
-      },
-      timeout: 30000 // 30 second timeout
+      data: requestData,
+      timeout: 30000
     });
     
     console.log('Safaricom API response status:', response.status);
     console.log('Safaricom API response data:', JSON.stringify(response.data));
     
-    // Parse the balance from the response
-    let balance = 0;
-    if (response.data) {
-      if (response.data.Balance) {
-        // Extract numeric value from "KES 1,234.56" format
-        const balanceStr = response.data.Balance;
-        const numericMatch = balanceStr.match(/[\d,]+\.?\d*/);
-        balance = numericMatch ? parseFloat(numericMatch[0].replace(/,/g, '')) : 0;
-        console.log('Parsed balance from Balance field:', balance);
-      } else if (response.data.balance) {
-        balance = response.data.balance;
-        console.log('Parsed balance from balance field:', balance);
-      } else if (typeof response.data === 'number') {
-        balance = response.data;
-        console.log('Parsed balance from number:', balance);
-      } else {
-        console.log('Unknown response format:', response.data);
-      }
+    const responseData = response.data;
+    
+    // ✅ Check if we got a valid response
+    if (responseData.ResponseCode === '0' && responseData.ConversationID) {
+      // Success - request accepted
+      console.log('✅ Balance request accepted. ConversationID:', responseData.ConversationID);
+      
+      return {
+        statusCode: 200,
+        body: JSON.stringify({
+          success: true,
+          balance: null, // Will be delivered via callback
+          message: 'Balance request accepted. You will receive the balance via callback.',
+          conversationId: responseData.ConversationID,
+          pending: true
+        })
+      };
+    } else if (responseData.ResponseCode) {
+      // Error response
+      console.log('❌ Safaricom returned error:', responseData);
+      
+      return {
+        statusCode: 400,
+        body: JSON.stringify({
+          success: false,
+          error: responseData.ResponseDescription || 'Safaricom API returned an error',
+          responseCode: responseData.ResponseCode
+        })
+      };
+    } else {
+      // Unknown response format
+      console.log('Unknown response format:', responseData);
+      
+      return {
+        statusCode: 200,
+        body: JSON.stringify({
+          success: true,
+          balance: 0,
+          message: 'Balance request processed. Check callback URL for balance.',
+          rawResponse: responseData
+        })
+      };
     }
     
-    return {
-      statusCode: 200,
-      body: JSON.stringify({
-        success: true,
-        balance: balance,
-        rawResponse: response.data
-      })
-    };
   } catch (error) {
     console.error('Error fetching paybill balance:', error);
     
@@ -106,7 +138,6 @@ exports.handler = async (event) => {
     if (error.response) {
       console.error('Response data:', error.response.data);
       console.error('Response status:', error.response.status);
-      console.error('Response headers:', error.response.headers);
       
       statusCode = error.response.status;
       
@@ -114,10 +145,12 @@ exports.handler = async (event) => {
         errorMessage = 'Invalid or expired access token. Please get a new token.';
       } else if (error.response.status === 403) {
         errorMessage = 'Unauthorized - Check your credentials and permissions.';
+      } else if (error.response.status === 404) {
+        errorMessage = 'API endpoint not found. Check the URL.';
+      } else if (error.response.data?.ResponseDescription) {
+        errorMessage = error.response.data.ResponseDescription;
       } else if (error.response.data?.errorMessage) {
         errorMessage = error.response.data.errorMessage;
-      } else if (error.response.data?.errorCode) {
-        errorMessage = `Error ${error.response.data.errorCode}: ${error.response.data.errorMessage || 'Unknown error'}`;
       }
     } else if (error.request) {
       console.error('No response received');
@@ -132,8 +165,7 @@ exports.handler = async (event) => {
       body: JSON.stringify({
         success: false,
         error: errorMessage,
-        details: process.env.NODE_ENV === 'development' ? error.message : undefined,
-        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
       })
     };
   }
